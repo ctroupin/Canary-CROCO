@@ -10,6 +10,13 @@ The toolbox doesn't have the possibility to create the forcing, so we rely on th
 https://roms-tools.readthedocs.io/en/latest/surface_forcing.html
 https://roms-tools.readthedocs.io/en/latest/datasets.html
 
+Procedure
+1. Edit the file `grid_neatlantic.ini` and run `nb_make_grid.ipynb`. 
+2. Edit `download_mercator.ini` and run `./download_mercator.py`; the download is necessary before creating the initial and boundary conditions.
+2. Edit `ibc.ini` and `run make_ini.py`.
+
+
+
 #### Grid
 
 Essential step! Check [Evan's paper](https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2010JC006665).
