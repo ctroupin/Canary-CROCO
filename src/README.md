@@ -2,9 +2,12 @@
 
 ## Code download
 
-The code is obtained from the Gitlab repository: https://www.croco-ocean.org/download/. The code version is v2.1.2, released on November 18, 2025. 
+The code is obtained from the Gitlab repository: https://www.croco-ocean.org/download/.     
+The code version is v2.1.2, released on November 18, 2025. 
 
-## CROCO compilation
+The CROCO Python tools are obtained from https://croco-ocean.gitlabpages.inria.fr/croco_pytools/. 
+
+## Compilation
 
 There are essentially 3 files to edit before the compilation:
 1. `param.h`, which contains parameters related to the grid, the tiling (for parallel computing) and other options.
@@ -26,51 +29,41 @@ which allow one to use pre-installed software on the cluster.
 > [!NOTE]
 > We stick to HDF5 version 1.14.6, since issues were encountered with the version 2.0.0.
 
-
-This is the beginning of the file `jobcomp` (user options):
+If the netCDF compilation is successful, you will find (among other files) two executables: `nc-config` and `nf-config`. 
+They contain all the information concerning the compilation options used for netCDF (see example below). They are used in the `jobcomp` file to get the correct paths of the netCDF library.
 
 ```bash
-#
-# set source
-#
-SOURCE1=../OCEAN
+$ ./nf-config --all
 
-#
-# determine operating system
-#
-OS=`uname`
-echo "OPERATING SYSTEM IS: $OS"
+This netCDF-Fortran 4.5.2 has been built with the following features: 
 
-#
-# compiler options
-#
-FC=ifx
+  --cc        -> icc
+  --cflags    ->  -I/home/ulg/gher/ctroupin/.local/ifx/include -I/home/ulg/gher/ctroupin/.local/ifx/include
 
-#
-# set MPI directories if needed
-#
-MPIF90="mpiifort"
-MPILIB=""
-MPIINC=""
+  --fc        -> ifx
+  --fflags    -> -I/home/ulg/gher/ctroupin/.local/ifx/include
+  --flibs     -> -L/home/ulg/gher/ctroupin/.local/ifx/lib -lnetcdff -L/home/ulg/gher/ctroupin/.local/ifx/lib -lnetcdf -lnetcdf -lm 
+  --has-f90   -> 
+  --has-f03   -> yes
 
-#
-# set NETCDF directories
-#
-NETCDFLIB=$(~/.local/mpiifort/bin/nf-config --flibs)
-NETCDFINC=-I$(~/.local/mpiifort/bin/nf-config --includedir)
+  --has-nc2   -> yes
+  --has-nc4   -> yes
 
-#
-# set OASIS-MCT (or OASIS3) directories if needed
-#
-PRISM_ROOT_DIR=../../../oasis3-mct/compile_oa3-mct
+  --prefix    -> /home/ulg/gher/ctroupin/.local/ifx
+  --includedir-> /home/ulg/gher/ctroupin/.local/ifx/include
+  --version   -> netCDF-Fortran 4.5.2
+```
 
-#
-# set XIOS directory if needed
-#
-# if coupling with OASIS3-MCT is activated :
-# => you need to use XIOS compiled with the "--use_oasis oasis3_mct" flag
-#-----------------------------------------------------------
-XIOS_ROOT_DIR=$HOME/xios
+### CROCO compilation
+
+The compilation is launched by running the `jobcomp` script. Only the first lines have to be edited by setting the Fortran compiler (`FC=ifx`), the MPI compiler (`MPIF90="mpiifort"`) and the netCDF directories (`NETCDFLIB=$(~/.local/mpiifort/bin/nf-config --flibs)` and `NETCDFINC=-I$(~/.local/mpiifort/bin/nf-config --includedir)`). 
+
+If the compilation flags are to be modified, this has to be done around line 242 (middle of the script). 
+
+> [!WARNING]
+> As of January 2026, the code doesn't recognise the latest Intel Fortran compiler (`ifx`). The solution is to edit `jobcomp` around line 239 and rewrite it as:
+```bash
+if [[ $FC == ifort || $FC == ifx ]] ; then
 ```
 
 ### CROCO
@@ -133,53 +126,6 @@ python -m ipykernel install --user --name=CROCO
 module load NCO
 ncks -d time,-1, -d s_rho,32 croco_canary_avg.nc last_avg.nc 
 ```
-
-## Compiling with ifort and MPI
-
-The netCDF library was also compiled using the intel compilers.
-
-```bash
-~/.local/mpiifort/bin/nf-config --all
-
-This netCDF-Fortran 4.5.2 has been built with the following features: 
-
-  --cc        -> mpiicc
-  --cflags    ->  -I/home/ulg/gher/ctroupin/.local/mpiifort/include -I/home/ulg/gher/ctroupin/.local/mpiifort//include -I/include
-
-  --fc        -> mpiifort
-  --fflags    -> -I/home/ulg/gher/ctroupin/.local/mpiifort/include
-  --flibs     -> -L/home/ulg/gher/ctroupin/.local/mpiifort/lib -lnetcdff -L/home/ulg/gher/ctroupin/.local/mpiifort//lib -L/lib -lnetcdf -lnetcdf -lm 
-  --has-f90   -> 
-  --has-f03   -> yes
-
-  --has-nc2   -> yes
-  --has-nc4   -> yes
-
-  --prefix    -> /home/ulg/gher/ctroupin/.local/mpiifort
-  --includedir-> /home/ulg/gher/ctroupin/.local/mpiifort/include
-  --version   -> netCDF-Fortran 4.5.2
-```
-
-
-
-
-```bash
-module load releases/2023b
-module load impi
-```
-
-export CC=icx
-export CXX=icpc
-export CFLAGS='-O3 -xHost -ip -no-prec-div -static-intel'
-export CXXFLAGS='-O3 -xHost -ip -no-prec-div -static-intel'
-export F77=ifx
-export FC=ifx
-export F90=ifx
-export FFLAGS='-O3 -xHost -ip -no-prec-div -static-intel'
-export CPP='icx -E'
-export CXXCPP='icpc -E'
-
-
 
 ## Running the model
 
