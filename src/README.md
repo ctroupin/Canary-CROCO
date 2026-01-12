@@ -1,11 +1,83 @@
-## Preparing the input files
+# Running CROCO 
+
+## Code download
+
+The code is obtained from the Gitlab repository: https://www.croco-ocean.org/download/. The code version is v2.1.2, released on November 18, 2025. 
+
+## CROCO compilation
+
+There are essentially 3 files to edit before the compilation:
+1. `param.h`, which contains parameters related to the grid, the tiling (for parallel computing) and other options.
+2. `cppdef.h` contains the C preprocessor (CPP) options, for instance this is where the boundary conditions (open or close) are specified, or the type of paralelisation (openMP, MPI, ...).
+3. `jobcomp` is the file that starts the compilation; it can be editied to specify the Fortran compiler, the compilation flags, the path of the netCDF library
+
+### NetCDF compilation
+
+Before the model code compilation, it might be necessary to compile the netCDF library, in order to ensure that the compiler matches the one that will be used for CROCO. 
+
+Here we used the Intel compilers available on the cluster. The netCDF compilation involves a few steps collected into a single script [compile_netCDF.sh](src/compile_netCDF.sh). 
+This script calls `module` commands such as 
+```bash
+module load releases/2023b
+module load intel-compilers
+```
+which allow one to use pre-installed software on the cluster.
+
+> [!NOTE]
+> We stick to HDF5 version 1.14.6, since issues were encountered with the version 2.0.0.
+
+
+This is the beginning of the file `jobcomp` (user options):
+
+```bash
+#
+# set source
+#
+SOURCE1=../OCEAN
+
+#
+# determine operating system
+#
+OS=`uname`
+echo "OPERATING SYSTEM IS: $OS"
+
+#
+# compiler options
+#
+FC=ifx
+
+#
+# set MPI directories if needed
+#
+MPIF90="mpiifort"
+MPILIB=""
+MPIINC=""
+
+#
+# set NETCDF directories
+#
+NETCDFLIB=$(~/.local/mpiifort/bin/nf-config --flibs)
+NETCDFINC=-I$(~/.local/mpiifort/bin/nf-config --includedir)
+
+#
+# set OASIS-MCT (or OASIS3) directories if needed
+#
+PRISM_ROOT_DIR=../../../oasis3-mct/compile_oa3-mct
+
+#
+# set XIOS directory if needed
+#
+# if coupling with OASIS3-MCT is activated :
+# => you need to use XIOS compiled with the "--use_oasis oasis3_mct" flag
+#-----------------------------------------------------------
+XIOS_ROOT_DIR=$HOME/xios
+```
 
 ### CROCO
 
 We create the grid, initial conditions and boundary files with the [CROCO toolbox](https://croco-ocean.gitlabpages.inria.fr/croco_pytools/index.html) in Python. 
 
-The toolbox doesn't have the possibility to create the forcing, so we rely on the [ROMS toolbox](https://roms-tools.readthedocs.io/en/latest/) (also in Python), hoping that the horizontal grids are compatible.
-
+The toolbox doesn't have the possibility to create the forcing, so we will rely on the [ROMS toolbox](https://roms-tools.readthedocs.io/en/latest/) (also in Python), hoping that the horizontal grids are compatible.
 
 https://roms-tools.readthedocs.io/en/latest/surface_forcing.html
 https://roms-tools.readthedocs.io/en/latest/datasets.html
@@ -14,8 +86,6 @@ Procedure
 1. Edit the file `grid_neatlantic.ini` and run `nb_make_grid.ipynb`. 
 2. Edit `download_mercator.ini` and run `./download_mercator.py`; the download is necessary before creating the initial and boundary conditions.
 2. Edit `ibc.ini` and `run make_ini.py`.
-
-
 
 #### Grid
 
@@ -34,8 +104,6 @@ grid = Grid(
     verbose=True,
 )
 ```
-
-Note: should adjust the northeastern side to ensure the boundary is closed.
 
 ## Issues
 
@@ -63,9 +131,8 @@ python -m ipykernel install --user --name=CROCO
 
 ```bash
 module load NCO
-ncks -d time,4 -d s_rho,32 croco_canary_avg.nc last_avg.nc 
+ncks -d time,-1, -d s_rho,32 croco_canary_avg.nc last_avg.nc 
 ```
-
 
 ## Compiling with ifort and MPI
 
@@ -112,53 +179,7 @@ export FFLAGS='-O3 -xHost -ip -no-prec-div -static-intel'
 export CPP='icx -E'
 export CXXCPP='icpc -E'
 
-### CROCO compilation
 
-This is the beginning of the file `jobcomp` (user options):
-
-```bash
-#
-# set source
-#
-SOURCE1=../OCEAN
-
-#
-# determine operating system
-#
-OS=`uname`
-echo "OPERATING SYSTEM IS: $OS"
-
-#
-# compiler options
-#
-FC=ifort
-
-#
-# set MPI directories if needed
-#
-MPIF90="mpiifort"
-MPILIB=""
-MPIINC=""
-
-#
-# set NETCDF directories
-#
-NETCDFLIB=$(~/.local/mpiifort/bin/nf-config --flibs)
-NETCDFINC=-I$(~/.local/mpiifort/bin/nf-config --includedir)
-
-#
-# set OASIS-MCT (or OASIS3) directories if needed
-#
-PRISM_ROOT_DIR=../../../oasis3-mct/compile_oa3-mct
-
-#
-# set XIOS directory if needed
-#
-# if coupling with OASIS3-MCT is activated :
-# => you need to use XIOS compiled with the "--use_oasis oasis3_mct" flag
-#-----------------------------------------------------------
-XIOS_ROOT_DIR=$HOME/xios
-```
 
 ## Running the model
 
@@ -234,3 +255,44 @@ We use the notebook `nb_make_grid_zoom.ipynb`
 
 ./make_grid.py grid_zoom_new.ini
 ./make_grid.py ibc_zoom_agrif_nea.in
+
+## Optimisation
+
+### Compilation flags
+
+The initial value for the Fortran compilation flags is:
+
+```bash
+FFLAGS1="-O2 -mcmodel=medium -fno-alias -i4 -r8 -fp-model precise -axSSE4.2,AVX`
+```
+
+The `-axSSE4.2,AVX` is suggested by the [CECI documentation](https://support.ceci-hpc.be/doc/UsingSoftwareAndLibraries/CompilingSoftwareFromSources/#with-gcc)
+According to our test, this hasn't a significant change in the run time.
+
+
+### MPI tiling
+
+To test the run time we set up an experiment with only 5 time steps, no nesting, and no output file writing. There is still a short delay before the main time stepping, but it can be neglected for a normal run.
+
+MPI 
+
+
+
+| NP_XI | NP_ETA | Time (s)               | Comment  |
+|-------|:------:|------------------------|---|
+| 1     | 1      | 218                    |   |
+| 2     | 1      | 103                    |   |
+| 1     | 2      | 92                     |   |
+| 1     | 4      | 68                     |   |
+| 2     | 2      | 49                     |   |
+| 4     | 1      | 52                     |   |
+| 8     | 1      | 40                     |   |
+| 16    | 1      | 36                     |   |
+| 32    | 1      | 47                     |   |
+| 16    | 2      | 36                     |   |
+| 8     | 4      | 28                     |   |
+| 4     | 8      | More than 15 minutes!! | Not finished  |
+| 2     | 16     | More than 15 minutes!! | Not finished  |
+| 1     | 32     | 23                     |   |
+| 2     | 32     | 26                     |   |
+| 4     | 16     | 26                     |   |
