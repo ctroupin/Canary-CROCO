@@ -98,24 +98,6 @@ grid = Grid(
 )
 ```
 
-## Issues
-
-```python
-NotImplementedError: LateralFill currently supports only 2D masks.
-```
-
-+ there is a warning about the missing time dimension?
-
-Test: rename `valid_time` to `time`
-
-→ update the ROMS tools version
-
-mkvirtualenv --python=/usr/local/bin/python3.13 CROCO
-pip install roms-tools[stream]
-pip install ipykernel
-pip install gcsfs 
-pip install zarr
-python -m ipykernel install --user --name=CROCO
 
 
 ## Results
@@ -199,7 +181,7 @@ To test the run time we set up an experiment with only 5 time steps, no nesting,
 | 4     | 8      | More than 15 minutes!! | Not finished  |
 | 2     | 16     | More than 15 minutes!! | Not finished  |
 | 1     | 32     | 23                     |   |
-| 1     | 64     | 
+| 1     | 64     | ???                    | Error in the input reading | 
 | 2     | 32     | 26                     |   |
 | 4     | 16     | 26                     |   |
 
@@ -328,3 +310,32 @@ There was a mispelling in the command:
 srun -mpi=pmi2
 ```
 there should be a double dash before `mpi`!! 
+
+
+### NotImplementedError: LateralFill currently supports only 2D masks.
+
+This message appearq when we try to generate the forcing file using the Python toolbox and apply it on an ECMWF file containing the necessary variables.
+
+#### Error log
+
+```python
+NotImplementedError: LateralFill currently supports only 2D masks.
+```
+
+In addition there is a warning about the missing time dimension, that can be solved by renaming `valid_time` into `time`.
+
+#### Solution
+
+Not found yet.
+
+### Transport retry count exceeded on mlx5_0:1/IB
+
+#### Error log
+
+```bash
+slurmstepd: error: Detected 1 oom-kill event(s) in StepId=10238881.0. Some of your processes may have been killed by the cgroup out-of-memory handler.
+srun: error: nic5-w052: task 13: Out Of Memory
+slurmstepd: error: Detected 1 oom-kill event(s) in StepId=10238881.0. Some of your processes may have been killed by the cgroup out-of-memory handler.
+slurmstepd: error: Detected 1 oom-kill event(s) in StepId=10238881.0. Some of your processes may have been killed by the cgroup out-of-memory handler.
+[nic5-w050:2213736:0:2213736] ib_mlx5_log.c:171  Transport retry count exceeded on mlx5_0:1/IB (synd 0x15 vend 0x81 hw_synd 0/0)
+```

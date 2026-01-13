@@ -12,7 +12,7 @@ start_date:
 
 end_date: 
 2013--12-01 00:00:00
-
+w²
 xios_origin_date:
 2010-01-01 00:00:00
 
@@ -28,14 +28,14 @@ initial: NRREC / filename
     CROCO_FILES/croco_ini_nea_mercator_Y2013M01.nc
 restart:          NRST, NRPFRST / filename
                    720    -1
-    /scratch/ulg/gher/ctroupin/CROCO_FILES/run32_nea/croco_canary_rst.nc
+    /scratch/ulg/gher/ctroupin/CROCO_FILES/run32_nea_nest/croco_canary_rst.nc
     
 history: LDEFHIS, NWRT, NRPFHIS / filename 
             T      360     0
-    /scratch/ulg/gher/ctroupin/CROCO_FILES/run32_nea/croco_canary_his.nc
+    /scratch/ulg/gher/ctroupin/CROCO_FILES/run32_nea_nest/croco_canary_his.nc
 averages: NTSAVG, NAVG, NRPFAVG / filename
             1      360     0
-    /scratch/ulg/gher/ctroupin/CROCO_FILES/run32_nea/croco_canary_avg.nc
+    /scratch/ulg/gher/ctroupin/CROCO_FILES/run32_nea_nest/croco_canary_avg.nc
 
 primary_history_fields: zeta UBAR VBAR  U  V   wrtT(1:NT)
                           T    T   T   T  T    50*T
@@ -80,11 +80,11 @@ nudg_cof:    TauT_in, TauT_out, TauM_in, TauM_out  [days for all]
 
 diagnostics:   ldefdia   nwrtdia    nrpfdia /filename
                   T        72         0
-    /scratch/ulg/gher/ctroupin/CROCO_FILES/run32_nea/croco_canary_diag.nc
+    /scratch/ulg/gher/ctroupin/CROCO_FILES/run32_nea_nest/croco_canary_diag.nc
 
 diag_avg: ldefdia_avg  ntsdia_avg  nwrtdia_avg  nprfdia_avg /filename
                T          1           72            0
-    /scratch/ulg/gher/ctroupin/CROCO_FILES/run32_nea/croco_dia_avg.nc
+    /scratch/ulg/gher/ctroupin/CROCO_FILES/run32_nea_nest/croco_dia_avg.nc
 
 diag_mld_crit_threshold: CRT1 (Dens [kg/m3]), CRT2 (Temp [Celsius]), CRT3 (Temp [Celsius])
                          3.d-2                2.d-1                  5.d-1
