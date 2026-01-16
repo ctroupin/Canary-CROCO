@@ -1,22 +1,48 @@
 # Running CROCO 
 
-## Code download
+## Installation
+
+### Code download
 
 The code is obtained from the Gitlab repository: https://www.croco-ocean.org/download/.     
 The code version is v2.1.2, released on November 18, 2025. 
 
+The code compilation is described here.
+
+### Tooolbox installation
+
 The CROCO Python tools are obtained from https://croco-ocean.gitlabpages.inria.fr/croco_pytools/. 
 
-## Compilation
+#### Virtual environment
+For the installation it is required to create a virtual environment either using `conda` or `mamba`. In one of the machine tested, the procedure with `conda` did not work:
+```bash
+conda env create -f env.yml
+conda activate croco_pyenv
+```
+so we switch to `micromamba`.
+
+#### Compilation
+
+The Python toolbox requires the compilation of code that is written in Fortran. 
+cd prepro/Modules/tools_fort_routines
+make clean
+make
+
+## CROCO Compilation
 
 There are essentially 3 files to edit before the compilation:
 1. `param.h`, which contains parameters related to the grid, the tiling (for parallel computing) and other options.
 2. `cppdef.h` contains the C preprocessor (CPP) options, for instance this is where the boundary conditions (open or close) are specified, or the type of paralelisation (openMP, MPI, ...).
-3. `jobcomp` is the file that starts the compilation; it can be editied to specify the Fortran compiler, the compilation flags, the path of the netCDF library
+3. `jobcomp` is the file that starts the compilation; it can be editied to specify the Fortran compiler, the compilation flags, the path of the netCDF library etc.
 
 ### NetCDF compilation
 
 Before the model code compilation, it might be necessary to compile the netCDF library, in order to ensure that the compiler matches the one that will be used for CROCO. 
+Intel Fortran compiler can be installed with:
+```bash
+sudo apt install intel-oneapi-compiler-fortran
+```
+
 
 Here we used the Intel compilers available on the cluster. The netCDF compilation involves a few steps collected into a single script [compile_netCDF.sh](src/compile_netCDF.sh). 
 This script calls `module` commands such as 
@@ -24,7 +50,7 @@ This script calls `module` commands such as
 module load releases/2023b
 module load intel-compilers
 ```
-which allow one to use pre-installed software on the cluster.
+which allow one to use pre-installed software on the cluster. Those commands obviously depend on how the cluster manages the libraries.
 
 > [!NOTE]
 > We stick to HDF5 version 1.14.6, since issues were encountered with the version 2.0.0.
