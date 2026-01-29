@@ -39,35 +39,34 @@ cd prepro/Modules/tools_fort_routines
 make clean
 make
 
-## CROCO Compilation
+## NetCDF compilation
 
-There are essentially 3 files to edit before the compilation:
-1. `param.h`, which contains parameters related to the grid, the tiling (for parallel computing) and other options.
-2. `cppdef.h` contains the C preprocessor (CPP) options, for instance this is where the boundary conditions (open or close) are specified, or the type of paralelisation (openMP, MPI, ...).
-3. `jobcomp` is the file that starts the compilation; it can be editied to specify the Fortran compiler, the compilation flags, the path of the netCDF library etc.
+Before the CROCO code compilation, it might be necessary to compile the netCDF library, in order to ensure that the compiler matches the one that will be used for CROCO (Intel compilers in this case).
 
-### NetCDF compilation
-
-Before the model code compilation, it might be necessary to compile the netCDF library, in order to ensure that the compiler matches the one that will be used for CROCO. 
-Intel Fortran compiler can be installed with:
+The Intel Fortran compiler can be installed with:
 ```bash
 sudo apt install intel-oneapi-compiler-fortran
 ```
 
+Here we used the Intel compilers already available on the cluster. 
 
-Here we used the Intel compilers available on the cluster. The netCDF compilation involves a few steps collected into a single script [compile_netCDF.sh](src/compile_netCDF.sh). 
+The netCDF compilation involves a few steps collected into a single script [compile_netCDF.sh](../src/compile_netCDF.sh). 
+
 This script calls `module` commands such as 
 ```bash
 module load releases/2023b
 module load intel-compilers
 ```
-which allow one to use pre-installed software on the cluster. Those commands obviously depend on how the cluster manages the libraries.
+which allow one to use pre-installed software on the cluster. Those commands obviously depend on how the cluster manages the libraries (`slurm` is the workload manager for `NIC5` cluster)
 
 > [!NOTE]
-> We stick to HDF5 version 1.14.6, since issues were encountered with the version 2.0.0.
+> For the compilation, we stick to HDF5 version 1.14.6, since issues were encountered with the version 2.0.0.
 
-If the netCDF compilation is successful, you will find (among other files) two executables: `nc-config` and `nf-config`. 
-They contain all the information concerning the compilation options used for netCDF (see example below). They are used in the `jobcomp` file to get the correct paths of the netCDF library.
+If the netCDF compilation is successful, you will find (among other files) two executables: 
+- `nc-config` and 
+- `nf-config`.
+
+Running one of those files provide all the information concerning the compilation options used for netCDF (see example below). They are used in the `jobcomp` file to get the correct paths of the netCDF library.
 
 ```bash
 $ ./nf-config --all
@@ -91,9 +90,52 @@ This netCDF-Fortran 4.5.2 has been built with the following features:
   --version   -> netCDF-Fortran 4.5.2
 ```
 
-### CROCO compilation
+## CROCO Compilation
 
-The compilation is launched by running the `jobcomp` script. Only the first lines have to be edited by setting the Fortran compiler (`FC=ifx`), the MPI compiler (`MPIF90="mpiifort"`) and the netCDF directories (`NETCDFLIB=$(~/.local/mpiifort/bin/nf-config --flibs)` and `NETCDFINC=-I$(~/.local/mpiifort/bin/nf-config --includedir)`). 
+There are essentially 3 files to edit before the compilation, all located in `croco-v2.1.2/OCEAN`:
+1. `param.h`, which contains parameters related to the grid, the _tiling_ (for parallel computing) and other options.
+2. `cppdef.h` contains the C preprocessor (CPP) options, for instance this is where the boundary conditions (open or close) are specified, or the type of paralelisation (openMP, MPI, ...).
+3. `jobcomp` is the file that triggers the compilation; it can be edited to specify 
+   - the Fortran compiler, 
+   - the compilation flags, 
+   - the path of the netCDF library etc.
+
+In the followings we detail the steps to compile CROCO on `NIC5` machine using the Intel compilers.
+
+### Editing `cppdef.h`
+
+### Editing `param.h`
+
+You will need to create a line that matches the name of 
+
+```
+#  elif defined CANARY01 
+       parameter (LLm0=884, MMm0=800,  N=32)
+```
+
+If you work with MPI, you also need to set the values for `NP_XI` and `NP_ETA`, which define how the _tiling_ (or domain decomposition) is performed:
+
+```bash
+#ifdef MPI
+      integer NP_XI, NP_ETA, NNODES
+#if defined(SPLITTING_X) && defined(SPLITTING_ETA)
+      parameter (NP_XI=SPLITTING_X,  NP_ETA=SPLITTING_ETA,  NNODES=NP_XI*NP_ETA)
+#else
+      parameter (NP_XI=2,  NP_ETA=8,  NNODES=NP_XI*NP_ETA)
+```
+Here we will define the domain in 2 along the xi axis and 8 in the η axis.
+
+
+### CROCO source code compilation
+
+The compilation is launched by running the `jobcomp` script. Only the first lines have to be edited by setting the Fortran compiler (`FC=ifx`), the MPI compiler (`MPIF90="mpiifort"`) and the netCDF directories, through the setting of the `nf-config` path:
+```bash
+NETCDFLIB=$(~/.local/mpiifort/bin/nf-config --flibs
+NETCDFINC=-I$(~/.local/mpiifort/bin/nf-config --includedir)
+```
+
+> [!NOTE]
+> Those variables can obviously be set _by hand_, the risk is that the netCDF library does not match the compilation settings needed for CROCO (i.e. netCDF compiled with `gfortran` and CROCO requiring `ifx`).
 
 If the compilation flags are to be modified, this has to be done around line 242 (middle of the script). 
 
