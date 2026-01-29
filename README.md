@@ -6,6 +6,10 @@ Implementation of the [CROCO](https://www.croco-ocean.org/) numerical model arou
 
 ```bash
 ├── bib 	# .bib file storing useful references
+|
+├── doc 	# documentation and presentations
+|
+├── figures	# plots and maps
 │   
 ├── input	# input files to be used with CROCO (`.ini` files)
 │   
