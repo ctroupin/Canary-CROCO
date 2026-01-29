@@ -5,23 +5,34 @@
 ### Code download
 
 The code is obtained from the Gitlab repository: https://www.croco-ocean.org/download/.     
-The code version is v2.1.2, released on November 18, 2025. 
+The code version is `v2.1.2`, released on November 18, 2025. 
 
-The code compilation is described here.
+The code compilation is described in this [section](#croco-compilation).
 
 ### Tooolbox installation
 
 The CROCO Python tools are obtained from https://croco-ocean.gitlabpages.inria.fr/croco_pytools/. 
 
 #### Virtual environment
-For the installation it is required to create a virtual environment either using `conda` or `mamba`. In one of the machine tested, the procedure with `conda` did not work:
+
+For the installation, it is required to create a virtual environment, either using `conda` or `mamba`.     
+In one of the machine tested, the procedure with `conda` 
 ```bash
 conda env create -f env.yml
 conda activate croco_pyenv
 ```
-so we switch to `micromamba`.
+did not work, so we switch to `micromamba`:
+```bash
+micromamba env create -f env.yml
+eval "$(micromamba shell hook --shell bash)"
+micromamba activate croco_pyenv
+```
 
-#### Compilation
+> [!NOTE]
+> Working with `pip` did not allow us to complete the installation.
+
+
+#### Toolbox compilation
 
 The Python toolbox requires the compilation of code that is written in Fortran. 
 cd prepro/Modules/tools_fort_routines
