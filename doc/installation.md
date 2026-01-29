@@ -104,14 +104,66 @@ In the followings we detail the steps to compile CROCO on `NIC5` machine using t
 
 ### Editing `cppdef.h`
 
+`cppdef.h` is the file containing all the options for the pre-compilation. There are many options to chose, 
+
+First we set the name of our configuration (around line 55):
+```bash
+ /* Configuration Name */
+# define CANARY01
+```
+then we activate/disable the different options, for instance:
+- the parallelisation: 
+  ```bash
+  # undef  OPENMP
+  # define  MPI
+  ```
+- the nesting:
+  ```bash
+  # define  AGRIF
+  # define  AGRIF_2WAY
+  ```
+- the boundary conditions (open or closed)
+  ```bash
+  # undef  OBC_EAST
+  # define OBC_WEST
+  # define OBC_NORTH
+  # define OBC_SOUTH
+  ```
+
+> [!NOTE]
+> The name used for the configuration (`CANARY01`) will be used in the file `param.h`.
+
+
 ### Editing `param.h`
 
-You will need to create a line that matches the name of 
+#### Setting the grid size
+
+The first step is to create a line that matches the name of configuration (`CANARY01`)
+and set the values for `LLm0` and `MMm0`
 
 ```
 #  elif defined CANARY01 
        parameter (LLm0=884, MMm0=800,  N=32)
 ```
+
+> [!WARNING]
+> The values for those parameters have to exactly matches the size of the grid, defined by `nx` and `ny`
+
+For example:
+```bash 
+ncdump -h croco_grd.nc | tail -10
+    :created = "2025-12-23T11:42:02.730436" ;
+		:type = "CROCO grid file produced by croco_pytools" ;
+		:nx = 884 ;
+		:ny = 800 ;
+		:size_x_km = 3300LL ;
+		:size_y_km = 3000LL ;
+		:central_lon = -23LL ;
+		:central_lat = 37.2 ;
+		:rotation = -5.5 ;
+```
+
+#### Setting the tiling
 
 If you work with MPI, you also need to set the values for `NP_XI` and `NP_ETA`, which define how the _tiling_ (or domain decomposition) is performed:
 
@@ -123,19 +175,22 @@ If you work with MPI, you also need to set the values for `NP_XI` and `NP_ETA`, 
 #else
       parameter (NP_XI=2,  NP_ETA=8,  NNODES=NP_XI*NP_ETA)
 ```
-Here we will define the domain in 2 along the xi axis and 8 in the η axis.
+Here we will define the domain in **2** along the ξ axis and **8** in the η axis. 
+
+> [!NOTE]
+> Those numbers will have to be taken into account when submitting the job on the cluster.
 
 
-### CROCO source code compilation
+### Editing `jobcomp`
 
-The compilation is launched by running the `jobcomp` script. Only the first lines have to be edited by setting the Fortran compiler (`FC=ifx`), the MPI compiler (`MPIF90="mpiifort"`) and the netCDF directories, through the setting of the `nf-config` path:
+The compilation is triggered by running the `jobcomp` script. Only the first lines have to be edited by setting the Fortran compiler (`FC=ifx`), the MPI compiler (`MPIF90="mpiifort"`) and the netCDF directories, through the setting of the `nf-config` path:
 ```bash
 NETCDFLIB=$(~/.local/mpiifort/bin/nf-config --flibs
 NETCDFINC=-I$(~/.local/mpiifort/bin/nf-config --includedir)
 ```
 
 > [!NOTE]
-> Those variables can obviously be set _by hand_, the risk is that the netCDF library does not match the compilation settings needed for CROCO (i.e. netCDF compiled with `gfortran` and CROCO requiring `ifx`).
+> Those environment variables can obviously be set _by hand_, the risk is that the netCDF library does not match the compilation settings needed for CROCO (i.g., netCDF compiled with `gfortran` and CROCO requiring `ifx`).
 
 If the compilation flags are to be modified, this has to be done around line 242 (middle of the script). 
 
@@ -145,38 +200,34 @@ If the compilation flags are to be modified, this has to be done around line 242
 if [[ $FC == ifort || $FC == ifx ]] ; then
 ```
 
-### CROCO
+The `jobcomp` execution lasts for a few minutes and create an executable `croco` in the same directory.
 
-We create the grid, initial conditions and boundary files with the [CROCO toolbox](https://croco-ocean.gitlabpages.inria.fr/croco_pytools/index.html) in Python. 
+## CROCO input files
 
-The toolbox doesn't have the possibility to create the forcing, so we will rely on the [ROMS toolbox](https://roms-tools.readthedocs.io/en/latest/) (also in Python), hoping that the horizontal grids are compatible.
+For our application we will create files storing:
+1. the grid, 
+2. the initial conditions and 
+3. the boundary conditions.
 
-https://roms-tools.readthedocs.io/en/latest/surface_forcing.html
-https://roms-tools.readthedocs.io/en/latest/datasets.html
+To this end we use the [CROCO toolbox](https://croco-ocean.gitlabpages.inria.fr/croco_pytools/index.html) in Python. 
 
-Procedure
-1. Edit the file `grid_neatlantic.ini` and run `nb_make_grid.ipynb`. 
-2. Edit `download_mercator.ini` and run `./download_mercator.py`; the download is necessary before creating the initial and boundary conditions.
-2. Edit `ibc.ini` and `run make_ini.py`.
+> [!NOTE]
+> The toolbox doesn't have the possibility to create the forcing file, but it uses atmospheric state variables to compute the fluxes _online_.
 
-#### Grid
+#### Grid file
 
-Essential step! Check [Evan's paper](https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2010JC006665).
+Edit the file `grid_neatlantic.ini` and run `nb_make_grid.ipynb`. 
 
-```python
-grid = Grid(
-    nx=520,  # number of grid points in x-direction
-    ny=450,  # number of grid points in y-direction
-    size_x=3300,  # domain size in x-direction (in km)
-    size_y=1350,  # domain size in y-direction (in km)
-    center_lon=-17.75,  # longitude of the center of the domain
-    center_lat=30,  # latitude of the center of the domain
-    rot=-15,  # rotation of the grid (in degrees)
-    N=40,  # number of vertical layers
-    verbose=True,
-)
-```
+#### Initial conditions
 
+Edit the file `ibc.ini` and `run make_ini.py`.
+
+#### Boundary conditions
+
+
+#### Forcing
+
+1. Edit `download_mercator.ini` and run `./download_mercator.py`; the download is necessary before creating the initial and boundary conditions.
 
 
 ## Results
