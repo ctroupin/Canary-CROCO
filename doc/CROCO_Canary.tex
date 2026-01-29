@@ -1,0 +1,198 @@
+\input{CTstyle.tex}
+\newcommand{\listcheck}{\textcolor{DarkGreen}{\checkmark}}
+%\newcommand{\listcross}{\textcolor{red}{$\times$}}
+
+\newcommand{\mycomment}[1]{\hfill\textcolor{LightGray}{(#1)}}
+
+\setbeamertemplate{frametitle}[default][left,leftskip=1cm] % <-- choose here the leftskip you wish
+\newcommand{\mydoi}[1]{\textcolor{mycolor1}{\aiDoi~\href{https://doi.org/#1}{#1}}}
+
+
+\title{Hydrodynamic modelling of the Canary Islands}
+\subtitle{}
+\author[C.~Troupin]{Charles Troupin}
+%\institute{GHER, ULiège}
+\date{\today}
+%\titlegraphic{\includegraphics[height=\logoheight]{logo_uliege_square}\includegraphics[height=\logoheight]{logo_gher}}
+  
+\urlstyle{rm}
+\begin{document}
+{
+%\usebackgroundtemplate{\tikz\node[opacity=0.5] {\hspace{-1cm}\includegraphics[width=1.2\paperwidth]{Athens_2155}}; }
+\begin{frame}
+\maketitle
+\end{frame}
+}
+%-----------------------------------------------------------------------------------------------
+
+\begin{frame}[c]
+\frametitle{Motivations}
+
+\begin{enumerate}
+\item Have a running implementation of CROCO around the islands
+\item Document the steps necessary to prepare a simulation
+\item Simulate past situations using a realistic configuration
+\end{enumerate}
+
+\end{frame}
+
+%-----------------------------------------------------------------------------------------------
+
+\begin{frame}[c]
+\frametitle{The model: CROCO}
+
+\textbf{C}oastal and \textbf{R}egional \textbf{O}cean \textbf{CO}mmunity model
+
+\faLink~\url{https://www.croco-ocean.org/}
+
+\begin{itemize}
+\item Simulation of high-resolution dynamics in the coastal ocean
+\item Coupling with atmosphere, sediments, biogeochemistry
+\item Non-hydrostatic capabilities
+\item Large user community  \hfill \url{https://forum.croco-ocean.org/}
+\end{itemize}
+
+\end{frame}
+
+%-----------------------------------------------------------------------------------------------
+
+\begin{frame}[c]
+\frametitle{Pre-processing: creation of input files}
+\begin{enumerate}
+\item Grid(s)
+\item Initial conditions
+\item Boundary conditions
+\item Atmospheric forcing
+\end{enumerate}
+
+\end{frame}
+%-----------------------------------------------------------------------------------------------
+
+\begin{frame}[c]
+
+\frametitle{Pre-processing: existing toolboxes}
+
+\begin{description}
+\item[CROCO\_PYTOOLS:] scripts in Python for the creation of the input files (except the forcing!)\\
+\url{https://croco-ocean.gitlabpages.inria.fr/croco_pytools/}
+\item[ROMS-Tools] script in Python to work with UCLA-ROMS\\
+\url{https://roms-tools.readthedocs.io/en/latest/}
+\end{description}
+
+
+\end{frame}
+
+%-----------------------------------------------------------------------------------------------
+
+\begin{frame}[t]
+\frametitle{Main grid}
+Parent grid: inspired from E.~Mason (2011) \hfill \mydoi{10.1029/2010JC006665}
+Child grid: Canary islands and Cape Ghir
+
+\begin{columns}
+\begin{column}{0.7\textwidth}
+\begin{figure}
+\centering
+\includegraphics[width=.99\textwidth]{figures/croco_domains.png}
+\end{figure}
+\end{column}
+\begin{column}{0.3\textwidth}
+Script: \texttt{make\_grid.py}\\
+Improvement: Strait of Gibraltar
+\end{column}
+\end{columns}
+
+\end{frame}
+
+%-----------------------------------------------------------------------------------------------
+
+\begin{frame}[c]
+\frametitle{Grids and spatial resolution}
+\begin{description}
+\item[Global grid:] GLORYS12V1 -- 1/12° \hfill \mydoi{10.48670/moi-00021}
+\item[Parent grid:] $\approx$ 3.75~km
+\item[Child grid:] $\approx$ 1~km
+\item[Child grid \#2] $\approx$ 300~m \mycomment{not implemented yet}
+\end{description}
+\textbf{Note:} nesting factor should be an odd number\\
+(typically 3 or 5)
+\end{frame}
+
+%-----------------------------------------------------------------------------------------------
+
+\begin{frame}[c]
+\frametitle{Atmospheric forcing}
+Two main approaches:
+\begin{enumerate}
+\item \textbf{Bulk} fluxes: use atmospheric state variables and compute fluxes
+\item \textbf{Net} fluxes: use pre-calculated atmospheric forcing fields
+\end{enumerate}
+
+\begin{description}
+\item[CROCO\_PYTOOLS:] bulk method only
+\item[ROMS-Tools:] code is available, but the data download takes hours 
+\end{description}
+
+\end{frame}
+
+\begin{frame}[c]
+\frametitle{Initial and boundary conditions}
+
+Initial and boundary fields extracted from GLORYS12V1\\
+and re-interpolated on the model grid 
+
+\end{frame}
+
+\begin{frame}[c]
+\frametitle{Nesting with AGRIF}
+
+AGRIF = \textbf{A}daptative \textbf{G}rid \textbf{R}efinement \textbf{i}n \textbf{F}ortran\\
+Debreu et al. (2008) \hfill \mydoi{10.1016/j.cageo.2007.01.009}\\
+\url{https://agrif.imag.fr}
+
+\begin{itemize}
+\item multi-level nesting in numerical models %\comment{not only ROMS}
+\item allows for two-way interaction
+\end{itemize}
+
+Pre-processing: same steps as parent grid except that the boundary conditions don't have to be extracted from GLORYS
+
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Machine configuration}
+
+Cluster \texttt{NIC5} from the \textit{Consortium des Équipements de Calcul Intensif} (C\'{E}CI)\\
+\url{https://www.ceci-hpc.be/clusters.html}
+
+\begin{itemize}
+\item Hosted at ULiège
+\item 4672 CPUs available
+\item 2 days max. time for a job
+\item Jobs managed through \texttt{Slurm} workload manager \hfill \url{https://slurm.schedmd.com/}
+\item Suitable for MPI Parallel job
+\end{itemize}
+
+
+\end{frame}
+
+
+%-----------------------------------------------------------------------------------------------
+
+\begin{frame}[c]
+\frametitle{Scientific objectives}
+\centering
+\huge
+
+\begin{enumerate}
+\item Process studies \comment{eddies, filaments, wake, \ldots}
+\item Setting of an operational (i.e. forecast) configuration
+\item Analysis of extreme events \comment{Delta or Hermine storm, \ldots) 
+\end{enumerate}
+\end{frame}
+
+\end{document}
+
+
+

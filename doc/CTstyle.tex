@@ -1,0 +1,99 @@
+\documentclass[final,xcolor=table,svgnames]{beamer}
+\usepackage[english]{babel}
+%\usepackage[latin1]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{tikz}
+\usepackage{doi}
+\usepackage{fontawesome}
+\usepackage{academicons}
+\usepackage{fontspec}
+\usepackage{ifsym}
+\usepackage{tcolorbox}
+
+\setsansfont{calibri}[
+Path = /home/ctroupin/.fonts/,
+Extension = .ttf ,
+BoldFont = *Bold,
+ItalicFont = *Italic]
+
+\setmainfont{calibri}[
+Path = /home/ctroupin/.fonts/,
+Extension = .ttf ,
+BoldFont = *Bold,
+ItalicFont = *Italic]
+
+\DeclareGraphicsExtensions{.pdf,.png,.PNG,.JPG,.jpg,.jpeg,.gif}
+
+
+\setbeamertemplate{navigation symbols}{}
+
+\tikzstyle{na} = [baseline=-.5ex]
+
+\parskip .5cm
+
+\definecolor{mycolor1}{HTML}{399ba3}
+\definecolor{mycolor2}{HTML}{9addbd}
+\definecolor{bluegher}{HTML}{4E519F}
+\definecolor{mygrey}{rgb}{0.25,.25,.25}
+\definecolor{commentcolor}{rgb}{0.75,.75,.75}
+\definecolor{arrowcolor}{rgb}{0.1,0.1,0.1}
+\definecolor{alertbg}{HTML}{FEFFBA}
+\definecolor{thegreen}{HTML}{52aaab}
+
+\setbeamercolor{title}{fg=black}
+\setbeamercolor{institute}{fg=mygrey}
+\setbeamercolor{frametitle}{fg=black}
+\setbeamercolor{structure}{fg=thegreen}
+\setbeamercolor{item projected}{fg=mycolor1}
+\setbeamercolor{alerted text}{fg=thegreen,bg=alertbg}
+
+\setbeamercovered{invisible}
+
+
+\addtobeamertemplate{navigation symbols}{}{%
+    \usebeamerfont{footline}%
+    \usebeamercolor[fg]{footline}%
+    \hspace{1em}%
+    \insertframenumber/\inserttotalframenumber
+}
+
+\setbeamercolor{footline}{fg=black}
+\setbeamerfont{footline}{series=\bfseries}
+
+\setbeamerfont{sectiontitle1}{size=\huge,family=\rmfamily}
+\setbeamerfont{sectiontitle2}{size=\fontsize{40}{20}\selectfont,shape=\itshape}
+\setbeamerfont{author}{size=\large}
+\setbeamerfont{institute}{size=\normalsize,family=\rmfamily}
+\setbeamerfont{title}{size=\fontsize{25}{20}\selectfont,shape=\itshape}
+\setbeamerfont{subtitle}{size=\normalsize,family=\rmfamily}
+\setbeamerfont{projected text}{size=\normalsize}
+%\setbeamertemplate{enumerate items}[$\tilde{}$]
+\setbeamertemplate{itemize item}{\footnotesize$\boldsymbol{\sim}$}
+\setbeamersize{description width=.5cm}
+%\setbeamersize{text margin left=1em}
+
+\setbeamertemplate{enumerate items}[circle]
+\setbeamercolor{item projected}{bg=mycolor1,fg=white}
+
+%--------------------------------
+\hypersetup{bookmarksopen=true,
+bookmarksnumbered=true,  
+pdffitwindow=true, 
+pdfstartview=Fit,
+%pdfpagemode=FullScreen,
+pdffitwindow=true,
+pdftoolbar=true,
+pdfmenubar=true,
+pdfwindowui=true,
+pdfsubject={CROCO, modelling},
+pdfauthor={C. Troupin},
+bookmarksopenlevel=0,
+colorlinks=true,
+linkcolor=bluegher,anchorcolor=black,%
+citecolor=bluegher,filecolor=black,%
+menucolor=black,urlcolor=bluegher,%
+pdfpageduration=1,%
+}
