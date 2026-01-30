@@ -46,7 +46,6 @@ The kernel for Jupyter is created with
 ipython kernel install --user --name=croco_pyenv
 ```
 
-
 ## NetCDF compilation
 
 Before the CROCO code compilation, it might be necessary to compile the netCDF library, in order to ensure that the compiler matches the one that will be used for CROCO (Intel compilers in this case).
@@ -220,32 +219,41 @@ For our application we will create files storing:
 To this end we use the [CROCO toolbox](https://croco-ocean.gitlabpages.inria.fr/croco_pytools/index.html) in Python. 
 
 > [!NOTE]
-> The toolbox doesn't have the possibility to create the forcing file, but it uses atmospheric state variables to compute the fluxes _online_.
+> The toolbox doesn't have the possibility to create the forcing file, but it uses atmospheric state variables to compute the fluxes _online_. This means that no forcing files are created, but atmospheric variables are read at each time step and used to compute the fluxes. 
 
 #### Grid file
 
-Edit the file `grid_neatlantic.ini` and run `nb_make_grid.ipynb`. 
+1. Edit the file `grid_neatlantic.ini`; this file contains the spatial definition of the grid, but also paths to the bathymetry and the coastline;
+2. Run the notebook `nb_make_grid.ipynb` or the script ``nb_make_grid.jl`. 
 
 #### Initial conditions
 
-Edit the file `ibc.ini` and `run make_ini.py`.
+Before the extraction of the initial and boundary conditions, it is necessary to have a numerical model outputs at our disposal. The CROCO Python tools provides scripts to download from:
+- HYCOM (script `download_hycom.py`)
+- Mercator models (script `download_mercator.py`)
+
+The procedure is as follows:
+1. Edit `download_mercator.ini` to specify the period of interest and the path to the grid file,
+2. Run `python download_mercator.py`,
+3. Edit `ibc.ini`
+4. Run `python make_ini.py ibc.ini`
+
+> [!NOTE]
+> This step implies the interpolation of the GLORYS model on the CROCO grid and can take some time. 
+
+> [!WARNING]
+> Reminder: don't forget to activate the `croco_pyenv` before running the different scripts.
 
 #### Boundary conditions
 
+The file `ibc.ini` has been edited in the previous step, hence the boundary conditions are created by runing `python make_bry.py ibc.ini`
 
 #### Forcing
 
-1. Edit `download_mercator.ini` and run `./download_mercator.py`; the download is necessary before creating the initial and boundary conditions.
+No forcing files are generated but files storing atmospheric variables have to be downloaded.
 
-
-## Results
-
-### Subsetting
-
-```bash
-module load NCO
-ncks -d time,-1, -d s_rho,32 croco_canary_avg.nc last_avg.nc 
-```
+1. Edit the file `download_era5.ini`
+2. Run `python download_era5.py download_era5.ini`
 
 ## Running the model
 
@@ -275,6 +283,19 @@ cd /home/ulg/gher/ctroupin/CROCO_Canary/croco-v2.1.2/OCEAN/
 #srun croco crocoNIC5.in
 #srun croco02 crocoNIC5_02.in
 srun --mpi=pmi2 croco_nea crocoNIC5_NEA_32.in
+```
+
+## Result processing
+
+Various commands that could be useful
+
+### Subsetting
+
+Often we only want to have the results at the surface. This can be done by activating the corresponding C
+ 
+```bash
+module load NCO
+ncks -d time,-1, -d s_rho,-1 croco_canary_avg.nc last_avg.nc 
 ```
 
 
