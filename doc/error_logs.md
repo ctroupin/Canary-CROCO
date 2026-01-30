@@ -152,3 +152,17 @@ slurmstepd: error: Detected 1 oom-kill event(s) in StepId=10238881.0. Some of yo
 slurmstepd: error: Detected 1 oom-kill event(s) in StepId=10238881.0. Some of your processes may have been killed by the cgroup out-of-memory handler.
 [nic5-w050:2213736:0:2213736] ib_mlx5_log.c:171  Transport retry count exceeded on mlx5_0:1/IB (synd 0x15 vend 0x81 hw_synd 0/0)
 ```
+
+### ERROR 1: PROJ: proj_create_from_database: Open of /home/ctroupin/miniconda3/envs/croco_pyenv/share/proj failed
+
+
+When running the first cell of the notebook:
+```python
+%matplotlib widget  
+%load_ext autoreload
+%autoreload 2
+
+import os
+# Import custom modules
+from Modules.croco_class import CROCO
+```
