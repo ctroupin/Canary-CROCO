@@ -16,5 +16,46 @@ Implementation of the [CROCO](https://www.croco-ocean.org/) numerical model arou
 └── src		# code for the plotting of results
 ```
 
+```geojson
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": 1,
+      "properties": {
+        "ID": 0
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+             [
+              -19.49170859801714,
+              30.842575145933793
+            ],
+            [
+              -19.49170859801714,
+              26.17776606462762
+            ],
+            [
+              -9.559587972756844,
+              26.17776606462762
+            ],
+            [
+              -9.559587972756844,
+              30.842575145933793
+            ],
+            [
+              -19.49170859801714,
+              30.842575145933793
+            ]
+          ]
+        ]
+      }
+    }
+  ]
+}
+```
 
 
