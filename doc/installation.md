@@ -280,8 +280,6 @@ export I_MPI_PMI_LIBRARY=/usr/lib64/libpmi2.so
 NCDIR=/home/ulg/gher/ctroupin/.local/mpiifort
 LD_LIBRARY_PATH=${NCDIR}/lib:${LD_LIBRARY_PATH}
 cd /home/ulg/gher/ctroupin/CROCO_Canary/croco-v2.1.2/OCEAN/
-#srun croco crocoNIC5.in
-#srun croco02 crocoNIC5_02.in
 srun --mpi=pmi2 croco_nea crocoNIC5_NEA_32.in
 ```
 
@@ -302,9 +300,10 @@ ncks -d time,-1, -d s_rho,-1 croco_canary_avg.nc last_avg.nc
 ## Nesting
 
 We use the notebook `nb_make_grid_zoom.ipynb`
-
+```
 ./make_grid.py grid_zoom_new.ini
 ./make_grid.py ibc_zoom_agrif_nea.in
+```
 
 ## Optimisation
 
