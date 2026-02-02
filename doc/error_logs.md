@@ -208,3 +208,15 @@ The `croco.in.1` file was not created (for the nested domain).
 ### Solution
 
 The initial conditions were created with a wrong version of the grid.
+
+## NF_FREAD ERROR: nf_get_vara netCDF error code
+
+### Error log
+
+```bash
+ NF_FREAD ERROR: nf_get_vara netCDF error code =  -40  mynode = 127
+
+ GET_GRID - error while reading variable: h
+            in grid netCDF file: CROCO_FILES/run_nea/croco_grd_nea.nc
+```
+The message is repeated several times. The 
