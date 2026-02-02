@@ -207,7 +207,7 @@ If the compilation flags are to be modified, this has to be done around line 242
 if [[ $FC == ifort || $FC == ifx ]] ; then
 ```
 
-The `jobcomp` execution lasts for a few minutes and create an executable `croco` in the same directory.
+The `jobcomp` execution lasts around 1 minute (2 minutes when AGRIF is enabled) and create an executable `croco` in the same directory.
 
 ## CROCO input files
 
@@ -283,20 +283,6 @@ cd /home/ulg/gher/ctroupin/CROCO_Canary/croco-v2.1.2/OCEAN/
 srun --mpi=pmi2 croco_nea crocoNIC5_NEA_32.in
 ```
 
-## Result processing
-
-Various commands that could be useful
-
-### Subsetting
-
-Often we only want to have the results at the surface. This can be done by activating the corresponding C
- 
-```bash
-module load NCO
-ncks -d time,-1, -d s_rho,-1 croco_canary_avg.nc last_avg.nc 
-```
-
-
 ## Nesting
 
 We use the notebook `nb_make_grid_zoom.ipynb`
@@ -336,9 +322,35 @@ To test the run time we set up an experiment with only 5 time steps, no nesting,
 | 32    | 1      | 47                     |   |
 | 16    | 2      | 36                     |   |
 | 8     | 4      | 28                     |   |
-| 4     | 8      | More than 15 minutes!! | Not finished  |
-| 2     | 16     | More than 15 minutes!! | Not finished  |
+| 4     | 8      | > 15 minutes           | Not finished  |
+| 2     | 16     | > 15 minutes           | Not finished  |
 | 1     | 32     | 23                     |   |
 | 1     | 64     | ???                    | Error in the input reading | 
 | 2     | 32     | 26                     |   |
 | 4     | 16     | 26                     |   |
+| 2     | 64     | ???                    | Error in the input reading |
+| 4     | 32     | > 5 minutes            | Not finished |
+| 8     | 16     | ?                      | Error in the input reading |
+
+
+
+
+## Result processing
+
+Various commands that could be useful for the result analysis.
+
+### Subsetting
+
+Often we only want to have the results at the surface. This can be done by activating the corresponding C
+ 
+```bash
+module load NCO
+ncks -d time,-1, -d s_rho,-1 croco_canary_avg.nc last_avg.nc 
+```
+
+for instance
+```bash
+ncks -d time,-1, -d s_rho,-1 croco_canary_avg.00085.nc last_00085.nc
+ncks -d time,-1, -d s_rho,-1 croco_canary_avg.00085.nc.1 last_00085.nc.1
+```
+
