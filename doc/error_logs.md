@@ -211,6 +211,8 @@ The initial conditions were created with a wrong version of the grid.
 
 ## NF_FREAD ERROR: nf_get_vara netCDF error code
 
+See discussion here: https://forum.croco-ocean.org/t/netcdf-error-in-cluster/731
+
 ### Error log
 
 ```bash
@@ -219,4 +221,8 @@ The initial conditions were created with a wrong version of the grid.
  GET_GRID - error while reading variable: h
             in grid netCDF file: CROCO_FILES/run_nea/croco_grd_nea.nc
 ```
-The message is repeated several times. The 
+The message is repeated several times. The error code can be -40 or -57.
+
+### Solution
+
+It seems it also depends on the tiling.
