@@ -170,6 +170,18 @@ ncdump -h croco_grd.nc | tail -10
 		:rotation = -5.5 ;
 ```
 
+> [!NOTE]
+> If you want to use another bathymetry, namely GEBCO, you need to download it from https://www.gebco.net/data-products/gridded-bathymetry-data (after extraction, we obtain the file `GEBCO_2025.nc`) and
+> edit the file `prepro/readers.jsonc` to ensure that the GEBCO variable names are correctly defined:
+```
+"gebco": {
+  "lon": "lon",
+  "lat": "lat",
+  "topo": "elevation",
+  "zaxis": "up"
+}
+```
+
 #### Setting the tiling
 
 If you work with MPI, you also need to set the values for `NP_XI` and `NP_ETA`, which define how the _tiling_ (or domain decomposition) is performed:
@@ -309,28 +321,37 @@ According to our test, this hasn't a significant change in the run time.
 
 To test the run time we set up an experiment with only 5 time steps, no nesting, and no output file writing. There is still a short delay before the main time stepping, but it can be neglected for a normal run.
 
-| NP_XI | NP_ETA | Time (s)               | Comment  |
-|-------|:------:|------------------------|---|
-| 1     | 1      | 218                    |   |
-| 2     | 1      | 103                    |   |
-| 1     | 2      | 92                     |   |
-| 1     | 4      | 68                     |   |
-| 2     | 2      | 49                     |   |
-| 4     | 1      | 52                     |   |
-| 8     | 1      | 40                     |   |
-| 16    | 1      | 36                     |   |
-| 32    | 1      | 47                     |   |
-| 16    | 2      | 36                     |   |
-| 8     | 4      | 28                     |   |
-| 4     | 8      | > 15 minutes           | Not finished  |
-| 2     | 16     | > 15 minutes           | Not finished  |
-| 1     | 32     | 23                     |   |
-| 1     | 64     | ???                    | Error in the input reading | 
-| 2     | 32     | 26                     |   |
-| 4     | 16     | 26                     |   |
-| 2     | 64     | ???                    | Error in the input reading |
-| 4     | 32     | > 5 minutes            | Not finished |
-| 8     | 16     | ?                      | Error in the input reading |
+| NP_XI | NP_ETA | Time (s)        | Comment  |
+|-------|:------:|-----------------|---|
+| 1     | 1      | 218             |   |
+| 2     | 1      | 103             |   |
+| 1     | 2      | 92              |   |
+| 1     | 4      | 68              |   |
+| 2     | 2      | 49              |   |
+| 4     | 1      | 52              |   |
+| 8     | 1      | 40              |   |
+| 16    | 1      | 36              |   |
+| | | | |   
+| 32    | 1      | 47              |   |
+| 16    | 2      | 36              |   |
+| 8     | 4      | 28              |   |
+| 4     | 8      | > 15 minutes    | Not finished  |
+| 2     | 16     | > 15 minutes    | Not finished  |
+| 1     | 32     | 23              |   |
+| | | | |   
+| 1     | 64     | ???             | Error in the input reading | 
+| 2     | 32     | 26              |   |
+| 4     | 16     | 26              |   |
+| 8     | 8      | 27              |   | 
+| 16    | 4      | 34              |   | 
+| 32    | 2      | 49              |   | 
+| 64    | 1      | 69              |   | 
+| | | | |   
+| 2     | 64     | --              | Error in the input reading |
+| 4     | 32     | 37              |  |
+| 8     | 16     | 42              |  |
+| 16    | 8      | 49              |  |
+| 32    | 4      | 64              |  | 
 
 
 
@@ -354,3 +375,15 @@ ncks -d time,-1, -d s_rho,-1 croco_canary_avg.00085.nc last_00085.nc
 ncks -d time,-1, -d s_rho,-1 croco_canary_avg.00085.nc.1 last_00085.nc.1
 ```
 
+
+## Create animation
+
+### Install `ffmpeg`
+
+### 
+
+1. Create one figure per time step
+2. Run command:
+```bash
+ffmpeg -framerate 24 -pattern_type glob -i "*_nest.png" -c:v libx264 -preset slow -crf 18 -pix_fmt yuv420p croco_anim.mp4
+```
