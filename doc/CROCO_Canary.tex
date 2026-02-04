@@ -26,15 +26,18 @@
 %-----------------------------------------------------------------------------------------------
 
 \begin{frame}[c]
-\frametitle{Motivations}
+\frametitle{Initial motivations}
 
-\begin{enumerate}
-\item Have a running implementation of CROCO around the islands
-\item Document the steps necessary to prepare a simulation
+\begin{enumerate}[label=\protect\mycirc{\color{white}\arabic*}]
+\item Have a working implementation of CROCO around the islands
 \item Simulate past situations using a realistic configuration
+\item Perform process-oriented numerical experiments
 \end{enumerate}
 
 \end{frame}
+
+
+%-----------------------------------------------------------------------------------------------
 
 \begin{frame}{Sea surface temperature in September 2022}
 \begin{figure}[h!]
@@ -44,8 +47,6 @@
 \end{figure} 
 \end{frame}
  
- \end{document}
-
 %-----------------------------------------------------------------------------------------------
 
 \begin{frame}[c]
@@ -53,7 +54,7 @@
 
 \textbf{C}oastal and \textbf{R}egional \textbf{O}cean \textbf{CO}mmunity model
 
-\faLink~\url{https://www.croco-ocean.org/}
+\url{https://www.croco-ocean.org/}
 
 \begin{itemize}
 \item Simulation of high-resolution dynamics in the coastal ocean
@@ -68,19 +69,20 @@
 
 \begin{frame}[c]
 \frametitle{Pre-processing: creation of input files}
-\begin{enumerate}
-\item Grid(s)
+\begin{enumerate}[label=\protect\mycirc{\color{white}\arabic*}]
+\item Grid(s) \mycomment{if nesting}
 \item Initial conditions
 \item Boundary conditions
 \item Atmospheric forcing
 \end{enumerate}
 
 \end{frame}
+
 %-----------------------------------------------------------------------------------------------
 
 \begin{frame}[c]
 
-\frametitle{Pre-processing: existing toolboxes}
+\frametitle{Pre-processing: 2 main toolboxes available}
 
 \begin{description}
 \item[CROCO\_PYTOOLS:] scripts in Python for the creation of the input files (except the forcing!)\\
@@ -96,18 +98,19 @@
 
 \begin{frame}[t]
 \frametitle{Main grid}
-Parent grid: inspired from E.~Mason (2011) \hfill \mydoi{10.1029/2010JC006665}
+
+Parent grid: inspired from E.~Mason (2011)% \hfill \mydoi{10.1029/2010JC006665}
 Child grid: Canary islands and Cape Ghir
 
 \begin{columns}
 \begin{column}{0.7\textwidth}
 \begin{figure}
 \centering
-\includegraphics[width=.99\textwidth]{figures/croco_domains.png}
+\includegraphics[width=.99\textwidth]{croco_domains.png}
 \end{figure}
 \end{column}
 \begin{column}{0.3\textwidth}
-Script: \texttt{make\_grid.py}\\
+%Script: \texttt{make\_grid.py}\\
 Improvement: Strait of Gibraltar
 \end{column}
 \end{columns}
@@ -119,7 +122,7 @@ Improvement: Strait of Gibraltar
 \begin{frame}[c]
 \frametitle{Grids and spatial resolution}
 \begin{description}
-\item[Global grid:] GLORYS12V1 -- 1/12° \hfill \mydoi{10.48670/moi-00021}
+\item[Global grid:] GLORYS12V1 -- 1/12°% \hfill \mydoi{10.48670/moi-00021}
 \item[Parent grid:] $\approx$ 3.75~km
 \item[Child grid:] $\approx$ 1~km
 \item[Child grid \#2] $\approx$ 300~m \mycomment{not implemented yet}
@@ -133,7 +136,7 @@ Improvement: Strait of Gibraltar
 \begin{frame}[c]
 \frametitle{Atmospheric forcing}
 Two main approaches:
-\begin{enumerate}
+\begin{enumerate}[label=\protect\mycirc{\color{white}\arabic*}]
 \item \textbf{Bulk} fluxes: use atmospheric state variables and compute fluxes
 \item \textbf{Net} fluxes: use pre-calculated atmospheric forcing fields
 \end{enumerate}
@@ -145,48 +148,89 @@ Two main approaches:
 
 \end{frame}
 
-\begin{frame}[c]
-\frametitle{Initial and boundary conditions}
 
-Initial and boundary fields extracted from GLORYS12V1\\
-and re-interpolated on the model grid 
+\begin{frame}[c]
+\frametitle{Atmospheric forcing: illustration}
+
+\begin{figure}
+\centering
+\includegraphics<1>[width=.8\textwidth]{forcing_2m_temperature}
+\includegraphics<2>[width=.8\textwidth]{forcing_sea_surface_temperature}
+\includegraphics<3>[width=.8\textwidth]{forcing_10m_u_component_of_wind}
+\includegraphics<4>[width=.8\textwidth]{forcing_10m_V_component_of_wind}
+\includegraphics<5>[width=.8\textwidth]{forcing_specific_humidity}
+\includegraphics<6>[width=.8\textwidth]{forcing_surface_net_solar_radiation}
+\includegraphics<7>[width=.8\textwidth]{forcing_total_precipitation}
+\includegraphics<8>[width=.8\textwidth]{forcing_windvec}
+
+\end{figure}
 
 \end{frame}
+
+\begin{frame}[t]
+\frametitle{Initial conditions: extracted from GLORYS12V1}
+
+\onslide<1-2>{Parent grid}
+\onslide<3-4>{Child grid}
+\begin{figure}
+\centering
+\includegraphics<1>[width=.8\textwidth]{croco_ini_nea_hermione_mercator_Y2022M09_temp.png}
+\includegraphics<2>[width=.8\textwidth]{croco_ini_nea_hermione_mercator_Y2022M09_salt.png}
+\includegraphics<3>[width=.8\textwidth]{croco_ini_nea_mercator_Y2022M09_temp.png}
+\includegraphics<4>[width=.8\textwidth]{croco_ini_nea_mercator_Y2022M09_salt.png}
+\end{figure}
+\onslide*<5>{GLORYS already rich in small-scale features}
+\end{frame}
+
+
 
 \begin{frame}[c]
 \frametitle{Nesting with AGRIF}
 
 AGRIF = \textbf{A}daptative \textbf{G}rid \textbf{R}efinement \textbf{i}n \textbf{F}ortran\\
-Debreu et al. (2008) \hfill \mydoi{10.1016/j.cageo.2007.01.009}\\
+Debreu et al. (2008) %\hfill \mydoi{10.1016/j.cageo.2007.01.009}\\
 \url{https://agrif.imag.fr}
 
 \begin{itemize}
 \item multi-level nesting in numerical models %\comment{not only ROMS}
-\item allows for two-way interaction
+\item allows two-way interaction
 \end{itemize}
 
 Pre-processing: same steps as parent grid except that the boundary conditions don't have to be extracted from GLORYS
 
+\end{frame}
+
+\begin{frame}[c]
+\frametitle{1-way vs 2-way nesting}
+
+% 2-way: the child (finer) domain feedbacks to the parent domain
+
+\begin{figure}
+\centering
+\includegraphics[width=.45\textwidth]{SST_20220923_090400.png}~\includegraphics[width=.45\textwidth]{SST_20220923_090120_nest.png}\\
+\includegraphics[width=.45\textwidth]{SST_20220923_090400_2way.png}~\includegraphics[width=.45\textwidth]{SST_20220923_090120_nest_2way.png}\\
+\end{figure}
+
 
 \end{frame}
 
-\begin{frame}
-\frametitle{Machine configuration}
 
-Cluster \texttt{NIC5} from the \textit{Consortium des Équipements de Calcul Intensif} (C\'{E}CI)\\
-\url{https://www.ceci-hpc.be/clusters.html}
+
+\begin{frame}
+\frametitle{Computing \& Machine configuration}
+
+Cluster \texttt{NIC5} from the \textit{Consortium des Équipements de Calcul Intensif} (C\'{E}CI -- \url{https://www.ceci-hpc.be/clusters.html})
 
 \begin{itemize}
-\item Hosted at ULiège
+% \item Hosted at ULiège
 \item 4672 CPUs available
 \item 2 days max. time for a job
 \item Jobs managed through \texttt{Slurm} workload manager \hfill \url{https://slurm.schedmd.com/}
-\item Suitable for MPI Parallel job
+\item Suitable for MPI Parallel jobs
+\item Compilation with Intel compilers
 \end{itemize}
 
-
 \end{frame}
-
 
 %-----------------------------------------------------------------------------------------------
 
@@ -195,7 +239,7 @@ Cluster \texttt{NIC5} from the \textit{Consortium des Équipements de Calcul Int
 \centering
 \huge
 
-\begin{enumerate}
+\begin{enumerate}[label=\protect\mycirc{\color{white}\arabic*}]
 \item Process studies \comment{eddies, filaments, wake, \ldots}
 \item Setting of an operational (i.e. forecast) configuration
 \item Analysis of extreme events \comment{Delta or Hermine storm, \ldots) 
