@@ -10,9 +10,9 @@ https://github.com/user-attachments/assets/36518d5f-7ee1-41b5-93d8-0112c2ded293
 
 ```bash
 ├── bib 	# .bib file storing useful references
-|
+│   
 ├── doc 	# documentation and presentations
-|
+│   
 ├── figures	# plots and maps
 │   
 ├── input	# input files to be used with CROCO (`.ini` files)
