@@ -20,6 +20,9 @@ https://github.com/user-attachments/assets/36518d5f-7ee1-41b5-93d8-0112c2ded293
 └── src		# code for the plotting of results
 ```
 
+## Region of interest
+The parent grid and the child grid are represented in the following map.
+
 ```geojson
 {
   "type": "FeatureCollection",
