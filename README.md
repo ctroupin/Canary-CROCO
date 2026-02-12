@@ -2,9 +2,9 @@
 
 Implementation of the [CROCO](https://www.croco-ocean.org/) numerical model around the Canary Islands.
 
-
 https://github.com/user-attachments/assets/36518d5f-7ee1-41b5-93d8-0112c2ded293
 
+https://github.com/user-attachments/assets/6e2a5ea0-f959-456b-a4b5-331d060250ec
 
 ## Project structure
 
