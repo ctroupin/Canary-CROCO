@@ -9,18 +9,21 @@ using Glob
 datadir = joinpath(ENV["GLOBALSCRATCH"], "CROCO_FILES")
 casename = "run_nea_hermione"
 casename = "run_nea_hermione_1way"
+casename = "run_nea_hermione_LaPalma"
 
 figdir = joinpath(ENV["GLOBALSCRATCH"], "figures/", casename)
 mkpath(figdir)
 
-
 # Read grid from grid files
 gridfile1 = joinpath(datadir, "croco_grd_nea.nc")
 gridfile2 = joinpath(datadir, "croco_grd_nea.nc.1")
+gridfile3 = joinpath(datadir, "croco_grd_nea.nc.2")
 
 # Create list of netCDF file
 avgfilelist1 = Glob.glob("croco_canary_avg*.nc", joinpath(datadir, casename))
 avgfilelist2 = Glob.glob("croco_canary_avg*.nc.1", joinpath(datadir, casename))
+avgfilelist3 = Glob.glob("croco_canary_avg*.nc.2", joinpath(datadir, casename))
+
 
 function load_grid(gridfile::AbstractString)
     NCDataset(gridfile) do ds
@@ -42,6 +45,7 @@ end
 
 lon1, lat1 = load_grid(gridfile1)
 lon2, lat2 = load_grid(gridfile2)
+lon3, lat3 = load_grid(gridfile3)
 
 # Extract land/sea mask and coastline
 # lon_landsea, lat_landsea, landsea = GeoDatasets.landseamask(; resolution = 'f', grid = 1.25)
@@ -69,34 +73,29 @@ function plot_temp(fig, ax, lon::Matrix{Float64}, lat::Matrix{Float64}, T::Matri
     ax.title = Dates.format(thedate, "yyyy-mm-dd HH:MM:SS")
     sf = surface!(ax, lon, lat, zeros(size(lon)), color=T,
     colormap = reverse(ColorSchemes.RdYlBu),
-    colorrange = [18.0, 25.5],
+    colorrange = [23.0, 25.],
     shading = NoShading,
     nan_color = :gray,
     interpolate = false,)
 
-    Colorbar(fig[1, 2], sf, label = "T (°C)", labelrotation = 0, height = @lift($(pixelarea(ax.scene)).widths[2]))
+    cb = Colorbar(fig[1, 2], sf, label = "T (°C)", labelrotation = 0, height = @lift($(pixelarea(ax.scene)).widths[2]))
     save(figname, fig)
-    delete!(ax, sf)     
-
+    
     return nothing
 end
 
 @info("Saving figure in directory $(figdir)");
 
-for datafile in avgfilelist1[6:end]
+for datafile in avgfilelist3[1:27]
     @info("Working on file $(datafile)")
 
     thedates, T = extract_T(datafile);
 
-    fig = Figure(size=(800, 800))
-    ax = GeoAxis(fig[1, 1], dest = "+proj=merc", xgridcolor = :gray, 
-    xgridwidth = 0.5, xgridstyle = :dash, ygridcolor = :gray, 
-    ygridwidth = 0.5, ygridstyle = :dash,)
 
     #xlims!(ax, -21., -7.)
     #ylims!(ax, 23., 32.)
-    xlims!(ax, -20., -9.)
-    ylims!(ax, 24., 33.)
+    #xlims!(ax, -20., -9.)
+    #ylims!(ax, 24., 33.)
 
     for (ii, dd) in enumerate(thedates)
 
@@ -106,7 +105,17 @@ for datafile in avgfilelist1[6:end]
 
         figname = joinpath(figdir, "SST_" * datestring * ".png")
 
-        plot_temp(fig, ax, lon1, lat1, T[:,:,ii], dd, figname)
+        fig = Figure(size=(800, 800))
+        ax = GeoAxis(fig[1, 1], dest = "+proj=merc")
+        #, xgridcolor = :gray, 
+        #xgridwidth = 0.5, xgridstyle = :dash, ygridcolor = :gray, 
+        #ygridwidth = 0.5, ygridstyle = :dash,)
+
+        if casename == "run_nea_hermione_LaPalma"
+            hidedecorations!(ax)
+        end
+        
+        plot_temp(fig, ax, lon3, lat3, T[:,:,ii], dd, figname)
 
         # sf = surface!(ax, lon1, lat1, zeros(size(lon)), color=T[:,:,ii],
         # colormap = reverse(ColorSchemes.RdYlBu),
@@ -122,41 +131,41 @@ for datafile in avgfilelist1[6:end]
     end
 end
 
-for datafile in avgfilelist2[6:end]
-    @info("Working on file $(datafile)")
+# for datafile in avgfilelist2[6:end]
+#     @info("Working on file $(datafile)")
 
-    thedates, T = extract_T(datafile);
+#     thedates, T = extract_T(datafile);
 
-    fig = Figure(size=(800, 800))
-    ax = GeoAxis(fig[1, 1], dest = "+proj=merc", xgridcolor = :gray, 
-    xgridwidth = 0.5, xgridstyle = :dash, ygridcolor = :gray, 
-    ygridwidth = 0.5, ygridstyle = :dash,)
+#     fig = Figure(size=(800, 800))
+#     ax = GeoAxis(fig[1, 1], dest = "+proj=merc", xgridcolor = :gray, 
+#     xgridwidth = 0.5, xgridstyle = :dash, ygridcolor = :gray, 
+#     ygridwidth = 0.5, ygridstyle = :dash,)
 
-    #xlims!(ax, -21., -7.)
-    #ylims!(ax, 23., 32.)
-    xlims!(ax, -20., -9.)
-    ylims!(ax, 24., 33.)
+#     #xlims!(ax, -21., -7.)
+#     #ylims!(ax, 23., 32.)
+#     xlims!(ax, -20., -9.)
+#     ylims!(ax, 24., 33.)
 
-    for (ii, dd) in enumerate(thedates)
+#     for (ii, dd) in enumerate(thedates)
 
-        @info("Working on date $(dd)")
-        datestring = Dates.format(dd, "yyyymmdd_HHMMSS")
-        @info(datestring)
+#         @info("Working on date $(dd)")
+#         datestring = Dates.format(dd, "yyyymmdd_HHMMSS")
+#         @info(datestring)
 
-        figname = joinpath(figdir, "SST_" * datestring * "_nest.png")
+#         figname = joinpath(figdir, "SST_" * datestring * "_nest.png")
 
-        plot_temp(fig, ax, lon2, lat2, T[:,:,ii], dd, figname)
+#         plot_temp(fig, ax, lon2, lat2, T[:,:,ii], dd, figname)
 
-        # sf = surface!(ax, lon1, lat1, zeros(size(lon)), color=T[:,:,ii],
-        # colormap = reverse(ColorSchemes.RdYlBu),
-        # colorrange = [16.0, 23.],
-        # shading = NoShading,
-        # nan_color = :gray,
-        # interpolate = false,)
+#         # sf = surface!(ax, lon1, lat1, zeros(size(lon)), color=T[:,:,ii],
+#         # colormap = reverse(ColorSchemes.RdYlBu),
+#         # colorrange = [16.0, 23.],
+#         # shading = NoShading,
+#         # nan_color = :gray,
+#         # interpolate = false,)
 
-        # Colorbar(fig[1, 2], sf, label = "T (°C)", labelrotation = 0, height = @lift($(pixelarea(ax.scene)).widths[2]))
-        # save(figname, fig)
+#         # Colorbar(fig[1, 2], sf, label = "T (°C)", labelrotation = 0, height = @lift($(pixelarea(ax.scene)).widths[2]))
+#         # save(figname, fig)
 
 
-    end
-end
+#     end
+# end
