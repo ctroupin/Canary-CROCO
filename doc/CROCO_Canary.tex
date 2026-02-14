@@ -11,7 +11,7 @@
 \title{Hydrodynamic modelling of the Canary Islands}
 \subtitle{}
 \author[C.~Troupin]{Charles Troupin}
-%\institute{GHER, ULiège}
+\institute{GHER, University of Liège}
 \date{\today}
 %\titlegraphic{\includegraphics[height=\logoheight]{logo_uliege_square}\includegraphics[height=\logoheight]{logo_gher}}
   
@@ -23,6 +23,8 @@
 \maketitle
 \end{frame}
 }
+
+
 %-----------------------------------------------------------------------------------------------
 
 \begin{frame}[c]
@@ -35,17 +37,22 @@
 \end{enumerate}
 
 \end{frame}
-
+ 
 
 %-----------------------------------------------------------------------------------------------
 
-\begin{frame}{Sea surface temperature in September 2022}
+\begin{frame}[c]
+\frametitle{Sea surface temperature in September 2022}
+
 \begin{figure}[h!]
+
 \centering    
-\movie[width=1.0\textwidth,autostart,showcontrols,loop] 
-  {\includegraphics[width=0.8\textwidth]{SST_20220901_030120_nest.png}}{croco_anim.mp4}
+\includegraphics[width=0.8\textwidth]{SST_20220901_030120_nest.png}
+%\movie[width=1.0\textwidth,autostart,showcontrols,loop] 
+%  {\includegraphics[width=0.8\textwidth]{SST_20220901_030120_nest.png}}{croco_anim.mp4}
 \end{figure} 
 \end{frame}
+
  
 %-----------------------------------------------------------------------------------------------
 
@@ -91,15 +98,15 @@
 \url{https://roms-tools.readthedocs.io/en/latest/}
 \end{description}
 
-
 \end{frame}
+
 
 %-----------------------------------------------------------------------------------------------
 
 \begin{frame}[t]
 \frametitle{Main grid}
 
-Parent grid: inspired from E.~Mason (2011)% \hfill \mydoi{10.1029/2010JC006665}
+Parent grid: inspired from E.~Mason (2011) \hfill \mydoi{10.1029/2010JC006665}
 Child grid: Canary islands and Cape Ghir
 
 \begin{columns}
@@ -148,6 +155,7 @@ Two main approaches:
 
 \end{frame}
 
+%-----------------------------------------------------------------------------------------------
 
 \begin{frame}[c]
 \frametitle{Atmospheric forcing: illustration}
@@ -167,6 +175,8 @@ Two main approaches:
 
 \end{frame}
 
+%-----------------------------------------------------------------------------------------------
+
 \begin{frame}[t]
 \frametitle{Initial conditions: extracted from GLORYS12V1}
 
@@ -182,7 +192,7 @@ Two main approaches:
 \onslide*<5>{GLORYS already rich in small-scale features}
 \end{frame}
 
-
+%-----------------------------------------------------------------------------------------------
 
 \begin{frame}[c]
 \frametitle{Nesting with AGRIF}
