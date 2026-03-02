@@ -5,8 +5,8 @@
 \newcommand{\mycomment}[1]{\hfill\textcolor{LightGray}{(#1)}}
 
 \setbeamertemplate{frametitle}[default][left,leftskip=1cm] % <-- choose here the leftskip you wish
-\newcommand{\mydoi}[1]{\textcolor{mycolor1}{\aiDoi~\href{https://doi.org/#1}{#1}}}
-
+%\newcommand{\mydoi}[1]{\textcolor{mycolor1}{\aiDoi~\href{https://doi.org/#1}{#1}}}
+\newcommand{\mydoi}[1]{\includegraphics[height=1ex]{doi.png}~\href{https://doi.org/#1}{#1}}
 
 \title{Hydrodynamic modelling of the Canary Islands}
 \subtitle{}
@@ -24,7 +24,10 @@
 \end{frame}
 }
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> b659ddf (presentation)
 %-----------------------------------------------------------------------------------------------
 
 \begin{frame}[c]
@@ -37,7 +40,10 @@
 \end{enumerate}
 
 \end{frame}
+<<<<<<< HEAD
  
+=======
+>>>>>>> b659ddf (presentation)
 
 %-----------------------------------------------------------------------------------------------
 
@@ -59,6 +65,10 @@
 \begin{frame}[c]
 \frametitle{The model: CROCO}
 
+\begin{figure}
+\centering
+\includegraphics[width=\textwidth]{croco_banner.png}
+\end{figure}
 \textbf{C}oastal and \textbf{R}egional \textbf{O}cean \textbf{CO}mmunity model
 
 \url{https://www.croco-ocean.org/}
@@ -67,7 +77,6 @@
 \item Simulation of high-resolution dynamics in the coastal ocean
 \item Coupling with atmosphere, sediments, biogeochemistry
 \item Non-hydrostatic capabilities
-\item Large user community  \hfill \url{https://forum.croco-ocean.org/}
 \end{itemize}
 
 \end{frame}
@@ -75,7 +84,31 @@
 %-----------------------------------------------------------------------------------------------
 
 \begin{frame}[c]
+\frametitle{Why this model (CROCO)?}
+
+\begin{itemize}
+\item Previous experience with ROMS 
+\item Large user community  \hfill \url{https://forum.croco-ocean.org/}
+\item Know capability to capture mesoscale and submesoscale features
+\item Open source code
+\end{itemize}
+\end{frame}
+
+
+{
+\setbeamercolor{background canvas}{bg=mycolor1}
+\setbeamercolor{normal text}{fg=white}
+\usebeamercolor[fg]{normal text}
+\begin{frame}
+\fontsize{50}{60}\selectfont What has been done so far?
+\end{frame}
+}
+
+%-----------------------------------------------------------------------------------------------
+
+\begin{frame}[c]
 \frametitle{Pre-processing: creation of input files}
+
 \begin{enumerate}[label=\protect\mycirc{\color{white}\arabic*}]
 \item Grid(s) \mycomment{if nesting}
 \item Initial conditions
@@ -104,45 +137,46 @@
 %-----------------------------------------------------------------------------------------------
 
 \begin{frame}[t]
+<<<<<<< HEAD
 \frametitle{Main grid}
 
 Parent grid: inspired from E.~Mason (2011) \hfill \mydoi{10.1029/2010JC006665}
 Child grid: Canary islands and Cape Ghir
+=======
+\frametitle{Model grids \& resolution}
+>>>>>>> b659ddf (presentation)
 
 \begin{columns}
-\begin{column}{0.7\textwidth}
+\begin{column}{0.6\textwidth}
 \begin{figure}
 \centering
 \includegraphics[width=.99\textwidth]{croco_domains.png}
 \end{figure}
 \end{column}
-\begin{column}{0.3\textwidth}
-%Script: \texttt{make\_grid.py}\\
-Improvement: Strait of Gibraltar
-\end{column}
-\end{columns}
+\begin{column}{0.4\textwidth}
 
-\end{frame}
-
-%-----------------------------------------------------------------------------------------------
-
-\begin{frame}[c]
-\frametitle{Grids and spatial resolution}
+\onslide*<2>{
 \begin{description}
-\item[Global grid:] GLORYS12V1 -- 1/12°% \hfill \mydoi{10.48670/moi-00021}
-\item[Parent grid:] $\approx$ 3.75~km
-\item[Child grid:] $\approx$ 1~km
+\item[Global grid:] GLORYS12V1 -- 1/12° \hfill \mydoi{10.48670/moi-00021}
+\item[Parent grid:] inspired from E.~Mason (2011) \hfill \mydoi{10.1029/2010JC006665}\\$\approx$ 3.75~km
+\item[Child grid:] Canary Islands and Cape Ghir (filaments) $\approx$ 1~km
 \item[Child grid \#2] $\approx$ 300~m \mycomment{not implemented yet}
 \end{description}
-\textbf{Note:} nesting factor should be an odd number\\
-(typically 3 or 5)
+}
+\end{column}
+\end{columns}
+\onslide*<2>{\textbf{Note:} nesting factor should be an odd number 
+\mycomment{typically 3 or 5}}
 \end{frame}
+
 
 %-----------------------------------------------------------------------------------------------
 
 \begin{frame}[c]
 \frametitle{Atmospheric forcing}
+
 Two main approaches:
+
 \begin{enumerate}[label=\protect\mycirc{\color{white}\arabic*}]
 \item \textbf{Bulk} fluxes: use atmospheric state variables and compute fluxes
 \item \textbf{Net} fluxes: use pre-calculated atmospheric forcing fields
@@ -156,6 +190,7 @@ Two main approaches:
 \end{frame}
 
 %-----------------------------------------------------------------------------------------------
+
 
 \begin{frame}[c]
 \frametitle{Atmospheric forcing: illustration}
@@ -175,7 +210,11 @@ Two main approaches:
 
 \end{frame}
 
+<<<<<<< HEAD
 %-----------------------------------------------------------------------------------------------
+=======
+
+>>>>>>> b659ddf (presentation)
 
 \begin{frame}[t]
 \frametitle{Initial conditions: extracted from GLORYS12V1}
@@ -189,7 +228,6 @@ Two main approaches:
 \includegraphics<3>[width=.8\textwidth]{croco_ini_nea_mercator_Y2022M09_temp.png}
 \includegraphics<4>[width=.8\textwidth]{croco_ini_nea_mercator_Y2022M09_salt.png}
 \end{figure}
-\onslide*<5>{GLORYS already rich in small-scale features}
 \end{frame}
 
 %-----------------------------------------------------------------------------------------------
@@ -198,7 +236,7 @@ Two main approaches:
 \frametitle{Nesting with AGRIF}
 
 AGRIF = \textbf{A}daptative \textbf{G}rid \textbf{R}efinement \textbf{i}n \textbf{F}ortran\\
-Debreu et al. (2008) %\hfill \mydoi{10.1016/j.cageo.2007.01.009}\\
+Debreu et al. (2008) \hfill \mydoi{10.1016/j.cageo.2007.01.009}\\
 \url{https://agrif.imag.fr}
 
 \begin{itemize}
@@ -210,6 +248,8 @@ Pre-processing: same steps as parent grid except that the boundary conditions do
 
 \end{frame}
 
+
+
 \begin{frame}[c]
 \frametitle{1-way vs 2-way nesting}
 
@@ -220,7 +260,6 @@ Pre-processing: same steps as parent grid except that the boundary conditions do
 \includegraphics[width=.45\textwidth]{SST_20220923_090400.png}~\includegraphics[width=.45\textwidth]{SST_20220923_090120_nest.png}\\
 \includegraphics[width=.45\textwidth]{SST_20220923_090400_2way.png}~\includegraphics[width=.45\textwidth]{SST_20220923_090120_nest_2way.png}\\
 \end{figure}
-
 
 \end{frame}
 
@@ -242,18 +281,64 @@ Cluster \texttt{NIC5} from the \textit{Consortium des Équipements de Calcul Int
 
 \end{frame}
 
+
+
+{
+\setbeamercolor{background canvas}{bg=mycolor1}
+\setbeamercolor{normal text}{fg=white}
+\usebeamercolor[fg]{normal text}
+\begin{frame}[c]
+\fontsize{50}{60}\selectfont What can/will be done?
+\end{frame}
+}
+
+\begin{frame}[c]
+\frametitle{Scientific objectives (short term)}
+\centering
+
+\begin{enumerate}[label=\protect\mycirc{\color{white}\arabic*}]
+\item Model \textbf{validation}
+\item Process studies \mycomment{eddies, upwelling filaments, wake, \ldots}
+\item Analysis of extreme events \mycomment{Delta or Hermine storm, \ldots}
+\end{enumerate}
+\end{frame}
+
+\begin{frame}[c]
+\frametitle{Technical objectives}
+\centering
+
+\begin{enumerate}[label=\protect\mycirc{\color{white}\arabic*}]
+\item Operational (i.e. forecast) configuration
+\item Coupling with a biogeochemical model
+\item Atmospheric forcing from a high-resolution model
+\item Increase number of CPUs
+\end{enumerate}
+\end{frame}
+
 %-----------------------------------------------------------------------------------------------
 
 \begin{frame}[c]
-\frametitle{Scientific objectives}
+\frametitle{Scientific objectives (longer term)}
 \centering
-\huge
 
 \begin{enumerate}[label=\protect\mycirc{\color{white}\arabic*}]
-\item Process studies \comment{eddies, filaments, wake, \ldots}
-\item Setting of an operational (i.e. forecast) configuration
-\item Analysis of extreme events \comment{Delta or Hermine storm, \ldots) 
+\item Eddy detection and tracking
+\item Particle tracking \mycomment{pollution event}
+\item Study of \textit{Trichodesmium erythronium} blooms
 \end{enumerate}
+\end{frame}
+
+%-----------------------------------------------------------------------------------------------
+
+\begin{frame}[c]
+\frametitle{Possible collaborations \& funding}
+\centering
+
+\begin{itemize}
+\item FNRS project \mycomment{200.000€ for 2 years}
+\item Copernicus Marine Service \mycomment{Service Evolution call for tenders}
+\end{itemize}
+
 \end{frame}
 
 \end{document}

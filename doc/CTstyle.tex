@@ -15,6 +15,7 @@
 \usepackage{carlito}
 \usepackage{multimedia}
 \usepackage{enumitem}
+\usepackage{animate}
 
 %\setsansfont{calibri}[
 %Path = /home/ctroupin/.fonts/,
@@ -50,8 +51,10 @@
 \setbeamercolor{institute}{fg=mygrey}
 \setbeamercolor{frametitle}{fg=black}
 \setbeamercolor{structure}{fg=thegreen}
-\setbeamercolor{item projected}{fg=mycolor1}
-\setbeamercolor{alerted text}{fg=thegreen,bg=alertbg}
+\setbeamercolor{itemize item}{fg=red}
+\setbeamercolor{itemize subitem}{fg=blue}
+\setbeamercolor{itemize subsubitem}{fg=cyan}
+
 
 \setbeamercovered{invisible}
 
@@ -65,7 +68,6 @@
 
 \setbeamercolor{footline}{fg=black}
 \setbeamerfont{footline}{series=\bfseries}
-
 \setbeamerfont{sectiontitle1}{size=\huge,family=\rmfamily}
 \setbeamerfont{sectiontitle2}{size=\fontsize{40}{20}\selectfont,shape=\itshape}
 \setbeamerfont{author}{size=\large}
@@ -73,13 +75,10 @@
 \setbeamerfont{title}{size=\fontsize{25}{20}\selectfont,shape=\itshape}
 \setbeamerfont{subtitle}{size=\normalsize,family=\rmfamily}
 \setbeamerfont{projected text}{size=\normalsize}
-%\setbeamertemplate{enumerate items}[$\tilde{}$]
-\setbeamertemplate{itemize item}{\footnotesize$\boldsymbol{\sim}$}
-\setbeamersize{description width=.5cm}
-%\setbeamersize{text margin left=1em}
 
-\setbeamertemplate{enumerate items}[circle]
-\setbeamercolor{item projected}{bg=mycolor1,fg=white}
+\setlist[itemize,1]{label=\textcolor{mycolor1}{\footnotesize$\boldsymbol{\sim}$}}
+\setbeamersize{description width=.5cm}
+
 
 % Define the command to draw the circled number
 \newcommand*\mycirc[1]{%
