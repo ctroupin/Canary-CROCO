@@ -10,6 +10,7 @@ datadir = joinpath(ENV["GLOBALSCRATCH"], "CROCO_FILES")
 casename = "run_nea_hermione"
 casename = "run_nea_hermione_1way"
 casename = "run_nea_hermione_LaPalma"
+# casename = "run_nea_hermione_1way"
 
 figdir = joinpath(ENV["GLOBALSCRATCH"], "figures/", casename)
 mkpath(figdir)
@@ -43,6 +44,58 @@ function extract_T(resfile::AbstractString)
     end
 end
 
+"""
+    compute_surf_vorticity(resfile, grdfile)
+
+Compute the normalised relative vorticity ζ = (∂v/∂x - ∂u/∂y) /f.
+"""
+function compute_surf_vorticity(resfile::String, grdfile::String)
+
+    NCDataset(resfile) do ds_hist
+        NCDataset(grdfile) do ds_grid
+
+            # Load time vector
+            thedates = ds_hist["time"][:]
+
+            # Read 2D metrics correctly (keep as matrices)
+            pm = ds_grid["pm"][:, :]   # 2D, rho-points
+            pn = ds_grid["pn"][:, :]   # 2D, rho-points
+
+            f = ds_grid["f"][:, :]
+
+            u = ds_hist["u"][:, :, end, :]   # (xi_u, eta_u, s_rho) = (Lm, Mm+1, N)
+            v = ds_hist["v"][:, :, end, :]   # (xi_v, eta_v, s_rho) = (Lm+1, Mm, N)
+
+            Lm = size(u, 1)          # number of psi points in xi direction
+            Mm = size(v, 2)          # number of psi points in eta direction
+            ntimes = size(u, 3)
+
+            zeta = zeros(eltype(u), Lm, Mm, ntimes)
+
+            for k = 1:ntimes
+                # ∂v/∂x at psi-points (difference in xi direction)
+                # v[1:Lm+1, 1:Mm, k]  →  shape (Lm+1, Mm)
+                pm_avg_x = @views (pm[1:Lm, 1:Mm] + pm[2:Lm+1, 1:Mm]) / 2   # (Lm, Mm)
+                dvdx = @views (v[2:Lm+1, 1:Mm, k] - v[1:Lm, 1:Mm, k]) .* pm_avg_x
+
+                # ∂u/∂y at psi-points (difference in eta direction)
+                # u[1:Lm, 1:Mm+1, k]  →  shape (Lm, Mm+1)
+                pn_avg_y = @views (pn[1:Lm, 1:Mm] + pn[1:Lm, 2:Mm+1]) / 2   # (Lm, Mm)
+                dudy = @views (u[1:Lm, 2:Mm+1, k] - u[1:Lm, 1:Mm, k]) .* pn_avg_y
+
+                # Both dvdx and dudy are now (Lm, Mm) → subtract
+                @views zeta[:, :, k] .= dvdx .- dudy ./ f[1:end-1, 1:end-1]
+            end
+            replace!(zeta, 0.0 => NaN)
+
+            return thedates::Vector{DateTime}, zeta::Array{Float32,3}
+            
+        end
+    end
+
+
+end
+
 lon1, lat1 = load_grid(gridfile1)
 lon2, lat2 = load_grid(gridfile2)
 lon3, lat3 = load_grid(gridfile3)
@@ -63,14 +116,12 @@ lon3, lat3 = load_grid(gridfile3)
 
 function plot_temp(fig, ax, lon::Matrix{Float64}, lat::Matrix{Float64}, T::Matrix{Float32}, thedate::DateTime, figname::AbstractString)
 
-    # fig = Figure(size=(800, 800))
-    # ax = GeoAxis(fig[1, 1], title=Dates.format(thedate, "yyyy-mm-dd HH:MM:SS"), dest = "+proj=merc", xgridcolor = :gray, 
-    # xgridwidth = 0.5, xgridstyle = :dash, ygridcolor = :gray, 
-    # ygridwidth = 0.5, ygridstyle = :dash,)
-
-    # xlims!(ax, -21., -7.)
-    # ylims!(ax, 23., 32.)
     ax.title = Dates.format(thedate, "yyyy-mm-dd HH:MM:SS")
+    xlims!(ax, -20.0, -9.0)
+    ylims!(ax, 24.0, 33.0)
+    ax.xticks = collect(-50.0:2:0.0)
+    ax.yticks = collect(20.0:2.0:45.0)
+
     sf = surface!(ax, lon, lat, zeros(size(lon)), color=T,
     colormap = reverse(ColorSchemes.RdYlBu),
     colorrange = [23.0, 25.],
@@ -84,12 +135,35 @@ function plot_temp(fig, ax, lon::Matrix{Float64}, lat::Matrix{Float64}, T::Matri
     return nothing
 end
 
-@info("Saving figure in directory $(figdir)");
+function plot_vort(fig, ax, lon::Matrix{Float64}, lat::Matrix{Float64}, vort::Matrix{Float32}, thedate::DateTime, figname::AbstractString)
+     ax.title = "Relative vorticity\n $(thedate)"
+    
+    sf = surface!(
+        ax,
+        lon,
+        lat,
+        vort,
+        colormap = :curl,
+        shading = NoShading,
+        nan_color = :gray,
+        interpolate = false,
+        colorrange = (-1.5, 1.5),
+    )
+    Colorbar(
+        fig[1, 2],
+        sf,
+        label = "ζ/f",
+        labelrotation = 0,
+        height = @lift($(pixelarea(ax.scene)).widths[2])
+    )
+    save(figname, fig)
+    delete!(ax, sf)  
+end
 
 for datafile in avgfilelist3[1:27]
     @info("Working on file $(datafile)")
 
-    thedates, T = extract_T(datafile);
+    
 
 
     #xlims!(ax, -21., -7.)

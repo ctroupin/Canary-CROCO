@@ -31,7 +31,6 @@ micromamba activate croco_pyenv
 > [!NOTE]
 > Working with `pip` did not allow us to complete the installation.
 
-
 #### Toolbox compilation
 
 The Python toolbox requires the compilation of code that is written in Fortran. 
@@ -40,6 +39,9 @@ cd prepro/Modules/tools_fort_routines
 make clean
 make
 ```
+
+> [!NOTE]
+> Recently a new error related to [https://forum.croco-ocean.org/t/croco-pytools-f2py-build-broken-since-feb-6-due-to-setuptools-update-temporary-workaround/7577/1](setuptools) appeared. It seems to be solved using the command `micromamba install "setuptools<81.0"`.
 
 The kernel for Jupyter is created with
 ```bash
@@ -57,7 +59,10 @@ sudo apt install intel-oneapi-compiler-fortran
 
 Here we used the Intel compilers already available on the cluster. 
 
-The netCDF compilation involves a few steps collected into a single script [compile_netCDF.sh](../src/compile_netCDF.sh). 
+The netCDF compilation involves a few steps collected into a single script [compile_netCDF.sh](../src/compile_netCDF.sh).  
+
+> [!NOTE]
+> This script has been tested for the compilation on `NIC5` machine. Some adaptations have to be performed if it has to be executed on another machine.
 
 This script calls `module` commands such as 
 ```bash
@@ -352,8 +357,6 @@ To test the run time we set up an experiment with only 5 time steps, no nesting,
 | 8     | 16     | 42              |  |
 | 16    | 8      | 49              |  |
 | 32    | 4      | 64              |  | 
-
-
 
 
 ## Result processing
